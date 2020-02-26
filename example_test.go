@@ -1,4 +1,4 @@
-package mail_test
+package gomail_test
 
 import (
 	"fmt"

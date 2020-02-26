@@ -3,4 +3,4 @@
 //
 // More info on Github: https://github.com/go-mail/mail
 //
-package mail
+package gomail
