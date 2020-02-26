@@ -7,6 +7,8 @@ import (
 	"net/smtp"
 )
 
+const loginMechanism = "LOGIN"
+
 // loginAuth is an smtp.Auth that implements the LOGIN authentication mechanism.
 type loginAuth struct {
 	username string
@@ -18,7 +20,7 @@ func (a *loginAuth) Start(server *smtp.ServerInfo) (string, []byte, error) {
 	if !server.TLS {
 		advertised := false
 		for _, mechanism := range server.Auth {
-			if mechanism == "LOGIN" {
+			if mechanism == loginMechanism {
 				advertised = true
 				break
 			}
@@ -30,7 +32,7 @@ func (a *loginAuth) Start(server *smtp.ServerInfo) (string, []byte, error) {
 	if server.Name != a.host {
 		return "", nil, errors.New("gomail: wrong host name")
 	}
-	return "LOGIN", nil, nil
+	return loginMechanism, nil, nil
 }
 
 func (a *loginAuth) Next(fromServer []byte, more bool) ([]byte, error) {

@@ -140,7 +140,8 @@ func (m *Message) FormatAddress(address, name string) string {
 	}
 
 	enc := m.encodeString(name)
-	if enc == name {
+	switch {
+	case enc == name:
 		m.buf.WriteByte('"')
 		for i := 0; i < len(name); i++ {
 			b := name[i]
@@ -150,11 +151,12 @@ func (m *Message) FormatAddress(address, name string) string {
 			m.buf.WriteByte(b)
 		}
 		m.buf.WriteByte('"')
-	} else if hasSpecials(name) {
+	case hasSpecials(name):
 		m.buf.WriteString(bEncoding.Encode(m.charset, name))
-	} else {
+	default:
 		m.buf.WriteString(enc)
 	}
+
 	m.buf.WriteString(" <")
 	m.buf.WriteString(address)
 	m.buf.WriteByte('>')

@@ -14,8 +14,9 @@ import (
 type Dialer struct {
 	// Host represents the host of the SMTP server.
 	Host string
-	// Port represents the port of the SMTP server.
-	Port int
+	// LocalName is the hostname sent to the SMTP server with the HELO command.
+	// By default, "localhost" is sent.
+	LocalName string
 	// Username is the username to use to authenticate to the SMTP server.
 	Username string
 	// Password is the password to use to authenticate to the SMTP server.
@@ -23,10 +24,8 @@ type Dialer struct {
 	// Auth represents the authentication mechanism used to authenticate to the
 	// SMTP server.
 	Auth smtp.Auth
-	// SSL defines whether an SSL connection is used. It should be false in
-	// most cases since the authentication mechanism should use the STARTTLS
-	// extension instead.
-	SSL bool
+	// Port represents the port of the SMTP server.
+	Port int
 	// TLSConfig represents the TLS configuration used for the TLS (when the
 	// STARTTLS extension is used) or SSL connection.
 	TLSConfig *tls.Config
@@ -38,15 +37,16 @@ type Dialer struct {
 	//
 	// This option has no effect if SSL is set to true.
 	StartTLSPolicy StartTLSPolicy
-	// LocalName is the hostname sent to the SMTP server with the HELO command.
-	// By default, "localhost" is sent.
-	LocalName string
 	// Timeout to use for read/write operations. Defaults to 10 seconds, can
 	// be set to 0 to disable timeouts.
 	Timeout time.Duration
 	// Whether we should retry mailing if the connection returned an error,
 	// defaults to true.
 	RetryFailure bool
+	// SSL defines whether an SSL connection is used. It should be false in
+	// most cases since the authentication mechanism should use the STARTTLS
+	// extension instead.
+	SSL bool
 }
 
 // NewDialer returns a new SMTP Dialer. The given parameters are used to connect
@@ -121,16 +121,16 @@ func (d *Dialer) Dial() (SendCloser, error) {
 
 	if d.Auth == nil && d.Username != "" {
 		if ok, auths := c.Extension("AUTH"); ok {
-			if strings.Contains(auths, "CRAM-MD5") {
+			switch {
+			case strings.Contains(auths, "CRAM-MD5"):
 				d.Auth = smtp.CRAMMD5Auth(d.Username, d.Password)
-			} else if strings.Contains(auths, "LOGIN") &&
-				!strings.Contains(auths, "PLAIN") {
+			case strings.Contains(auths, "LOGIN") && !strings.Contains(auths, "PLAIN"):
 				d.Auth = &loginAuth{
 					username: d.Username,
 					password: d.Password,
 					host:     d.Host,
 				}
-			} else {
+			default:
 				d.Auth = smtp.PlainAuth("", d.Username, d.Password, d.Host)
 			}
 		}
