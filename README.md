@@ -1,5 +1,5 @@
 # Gomail
-[![Build Status](https://travis-ci.org/go-mail/mail.svg?branch=master)](https://travis-ci.org/go-mail/mail) [![Code Coverage](http://gocover.io/_badge/github.com/go-mail/mail)](http://gocover.io/github.com/go-mail/mail) [![Documentation](https://godoc.org/github.com/go-mail/mail?status.svg)](https://godoc.org/github.com/go-mail/mail)
+[![Build Status](https://travis-ci.org/Shopify/gomail.svg?branch=master)](https://travis-ci.org/Shopify/gomail) [![codecov](https://codecov.io/gh/Shopify/gomail/branch/master/graph/badge.svg)](https://codecov.io/gh/Shopify/gomail) [![Documentation](https://godoc.org/github.com/Shopify/gomail?status.svg)](https://godoc.org/github.com/Shopify/gomail)
 
 This is an actively maintained fork of [Gomail][1] and includes fixes and
 improvements for a number of outstanding issues. The current progress is
@@ -14,7 +14,7 @@ as follows:
 
 See [Transitioning Existing Codebases][3] for more information on switching.
 
-[1]: https://github.com/go-gomail/gomail
+[1]: https://github.com/Shopify/gomail
 [2]: https://godoc.org/gopkg.in/mail.v2#NetDialTimeout
 [3]: #transitioning-existing-codebases
 
@@ -43,30 +43,13 @@ Gomail supports:
 
 ## Documentation
 
-https://godoc.org/github.com/go-mail/mail
-
-
-## Download
-
-If you're already using a dependency manager, like [dep][dep], use the following
-import path:
-
-```
-github.com/go-mail/mail
-```
-
-If you *aren't* using vendoring, `go get` the [Gopkg.in](http://gopkg.in)
-import path:
-
-```
-gopkg.in/mail.v2
-```
+https://godoc.org/github.com/Shopify/gomail
 
 [dep]: https://github.com/golang/dep#readme
 
 ## Examples
 
-See the [examples in the documentation](https://godoc.org/github.com/go-mail/mail#example-package).
+See the [examples in the documentation](https://godoc.org/github.com/Shopify/gomail#example-package).
 
 
 ## FAQ
@@ -96,15 +79,6 @@ func main() {
 ```
 
 Note, however, that this is insecure and should not be used in production.
-
-### Transitioning Existing Codebases
-
-If you're already using the original Gomail, switching is as easy as updating
-the import line to:
-
-```
-import gomail "gopkg.in/mail.v2"
-```
 
 ## Contribute
 
