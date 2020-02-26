@@ -105,13 +105,20 @@ func (m *Message) SetBoundary(boundary string) {
 
 // SetHeader sets a value to the given header field.
 func (m *Message) SetHeader(field string, value ...string) {
-	m.header[field] = m.encodeHeader(value)
+	m.SetRawHeader(field, m.encodeHeader(value)...)
+}
+
+// SetRawHeader sets the value for a field without any further encoding.
+// Useful when setting multiple addresses in a header:
+// m.SetRawHeader("To", m.FormatAddress(address, name), m.FormatAddress(address, name))
+func (m *Message) SetRawHeader(field string, value ...string) {
+	m.header[field] = value
 }
 
 func (m *Message) encodeHeader(values []string) []string {
 	encoded := make([]string, len(values))
-	for i := range values {
-		encoded[i] = m.encodeString(values[i])
+	for i, value := range values {
+		encoded[i] = m.encodeString(value)
 	}
 
 	return encoded
@@ -130,7 +137,7 @@ func (m *Message) SetHeaders(h map[string][]string) {
 
 // SetAddressHeader sets an address to the given header field.
 func (m *Message) SetAddressHeader(field, address, name string) {
-	m.header[field] = []string{m.FormatAddress(address, name)}
+	m.SetRawHeader(field, m.FormatAddress(address, name))
 }
 
 // FormatAddress formats an address and a name as a valid RFC 5322 address.
