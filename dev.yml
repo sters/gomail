@@ -1,0 +1,14 @@
+name: gomail
+
+up:
+  - go:
+      version: "1.13.7"
+      modules: true
+
+commands:
+  test: go test -race ./...
+  style:
+    run: bin/style
+    desc: Static verification using golangci or autofix issues when possible.
+    syntax:
+      optional: --fix
