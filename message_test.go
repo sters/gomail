@@ -481,7 +481,7 @@ func TestEmbedded(t *testing.T) {
 	m := NewMessage()
 	m.SetHeader("From", "from@example.com")
 	m.SetHeader("To", "to@example.com")
-	m.Embed(mockCopyFileWithHeader(m, "image1.jpg", map[string][]string{"Content-ID": {"<test-content-id>"}}))
+	m.Embed(mockCopyFileWithHeader("image1.jpg", map[string][]string{"Content-ID": {"<test-content-id>"}}))
 	m.Embed(mockCopyFile("image2.jpg"))
 	m.SetBody("text/plain", "Test")
 
@@ -706,9 +706,9 @@ func stubSendMail(t *testing.T, bCount int, want *message) SendFunc {
 			t.Error(err)
 		}
 		got := buf.String()
-		wantMsg := string("MIME-Version: 1.0\r\n" +
+		wantMsg := "MIME-Version: 1.0\r\n" +
 			"Date: Wed, 25 Jun 2014 17:46:00 +0000\r\n" +
-			want.content)
+			want.content
 		if bCount > 0 {
 			boundaries := getBoundaries(t, bCount, got)
 			for i, b := range boundaries {
@@ -783,7 +783,7 @@ func getBoundaries(t *testing.T, count int, m string) []string {
 	return []string{""}
 }
 
-var boundaryRegExp = regexp.MustCompile("boundary=(\\w+)")
+var boundaryRegExp = regexp.MustCompile(`boundary=(\w+)`)
 
 func mockCopyFile(name string) (string, FileSetting) {
 	return name, SetCopyFunc(func(w io.Writer) error {
@@ -792,7 +792,7 @@ func mockCopyFile(name string) (string, FileSetting) {
 	})
 }
 
-func mockCopyFileWithHeader(m *Message, name string, h map[string][]string) (string, FileSetting, FileSetting) {
+func mockCopyFileWithHeader(name string, h map[string][]string) (string, FileSetting, FileSetting) {
 	name, f := mockCopyFile(name)
 	return name, f, SetHeader(h)
 }

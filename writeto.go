@@ -266,13 +266,14 @@ func (w *messageWriter) writeBody(f func(io.Writer) error, enc Encoding) {
 		subWriter = w.partWriter
 	}
 
-	if enc == Base64 {
+	switch enc {
+	case Base64:
 		wc := base64.NewEncoder(base64.StdEncoding, newBase64LineWriter(subWriter))
 		w.err = f(wc)
 		wc.Close()
-	} else if enc == Unencoded {
+	case Unencoded:
 		w.err = f(subWriter)
-	} else {
+	default:
 		wc := newQPWriter(subWriter)
 		w.err = f(wc)
 		wc.Close()

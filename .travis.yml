@@ -7,7 +7,7 @@ go:
 go_import_path: github.com/Shopify/gomail
 
 script:
-  - make coverage
+  - make style coverage
 
 after_success:
   - if [[ -f "coverage.txt" ]]; then bash <(curl -s https://codecov.io/bash); fi
