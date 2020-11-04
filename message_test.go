@@ -712,7 +712,7 @@ func stubSendMail(t *testing.T, bCount int, want *message) SendFunc {
 		if bCount > 0 {
 			boundaries := getBoundaries(t, bCount, got)
 			for i, b := range boundaries {
-				wantMsg = strings.Replace(wantMsg, "_BOUNDARY_"+strconv.Itoa(i+1)+"_", b, -1)
+				wantMsg = strings.ReplaceAll(wantMsg, "_BOUNDARY_"+strconv.Itoa(i+1)+"_", b)
 			}
 		}
 
