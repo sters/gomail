@@ -148,7 +148,7 @@ func (d *Dialer) Dial() (SendCloser, error) {
 
 func (d *Dialer) tlsConfig() *tls.Config {
 	if d.TLSConfig == nil {
-		return &tls.Config{ServerName: d.Host}
+		return &tls.Config{ServerName: d.Host, MinVersion: tls.VersionTLS12}
 	}
 	return d.TLSConfig
 }
