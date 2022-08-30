@@ -8,7 +8,7 @@ class Style
   class << self
     INSTALLER_URL = 'https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh'
     EXECUTABLE = 'golangci-lint'
-    VERSION = '1.32.0'
+    VERSION = '1.49.0'
     VERSION_TAG = "v#{VERSION}"
 
     def call
@@ -19,7 +19,9 @@ class Style
     private
 
     def install_path
-      gopath = ENV.fetch('GOPATH', ENV.fetch('HOME')).split(':').first
+      gopath = IO.popen('go env GOBIN', 'r+') {|io| io.gets.strip }
+      gopath = IO.popen('go env GOPATH', 'r+') {|io| io.gets.strip } if gopath.empty?
+      gopath = ENV.fetch('GOPATH', ENV.fetch('HOME')).split(':').first if gopath.empty?
       File.join(gopath, 'bin')
     end
 

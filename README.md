@@ -1,22 +1,21 @@
 # Gomail
-[![Build Status](https://travis-ci.org/Shopify/gomail.svg?branch=master)](https://travis-ci.org/Shopify/gomail) [![codecov](https://codecov.io/gh/Shopify/gomail/branch/master/graph/badge.svg)](https://codecov.io/gh/Shopify/gomail) [![Documentation](https://godoc.org/github.com/Shopify/gomail?status.svg)](https://godoc.org/github.com/Shopify/gomail)
+
+[![Build Status](https://travis-ci.org/Shopify/gomail.svg?branch=master)](https://travis-ci.org/Shopify/gomail) [![codecov](https://codecov.io/gh/Shopify/gomail/branch/master/graph/badge.svg)](https://codecov.io/gh/Shopify/gomail) [![Documentation](https://pkg.go.dev/github.com/Shopify/gomail?status.svg)](https://pkg.go.dev/github.com/Shopify/gomail)
 
 This is an actively maintained fork of [Gomail][1] and includes fixes and
 improvements for a number of outstanding issues. The current progress is
 as follows:
 
- - [x] Timeouts and retries can be specified outside of the 10 second default.
- - [x] Proxying is supported through specifying a custom [NetDialTimeout][2].
- - [ ] Filenames are properly encoded for non-ASCII characters.
- - [ ] Email addresses are properly encoded for non-ASCII characters.
- - [ ] Embedded files and attachments are tested for their existence.
- - [ ] An `io.Reader` can be supplied when embedding and attaching files.
+- [x] Timeouts and retries can be specified outside of the 10 second default.
+- [x] Proxying is supported through specifying a custom [NetDialTimeout][2].
+- [ ] Filenames are properly encoded for non-ASCII characters.
+- [ ] Email addresses are properly encoded for non-ASCII characters.
+- [ ] Embedded files and attachments are tested for their existence.
+- [ ] An `io.Reader` can be supplied when embedding and attaching files.
 
-See [Transitioning Existing Codebases][3] for more information on switching.
+[1]: https://github.com/go-gomail/gomail
+[2]: https://pkg.go.dev/github.com/Shopify/gomail#NetDialTimeout
 
-[1]: https://github.com/Shopify/gomail
-[2]: https://godoc.org/gopkg.in/mail.v2#NetDialTimeout
-[3]: #transitioning-existing-codebases
 
 ## Introduction
 
@@ -27,12 +26,13 @@ Gomail can only send emails using an SMTP server. But the API is flexible and it
 is easy to implement other methods for sending emails using a local Postfix, an
 API, etc.
 
-It requires Go 1.2 or newer. With Go 1.5, no external dependencies are used.
+It requires Go 1.18 or newer.
 
 
 ## Features
 
 Gomail supports:
+
 - Attachments
 - Embedded images
 - HTML and text templates
@@ -43,13 +43,12 @@ Gomail supports:
 
 ## Documentation
 
-https://godoc.org/github.com/Shopify/gomail
+https://pkg.go.dev/github.com/Shopify/gomail
 
-[dep]: https://github.com/golang/dep#readme
 
 ## Examples
 
-See the [examples in the documentation](https://godoc.org/github.com/Shopify/gomail#example-package).
+See the [examples in the documentation](https://pkg.go.dev/github.com/Shopify/gomail#example-package).
 
 
 ## FAQ
@@ -67,7 +66,7 @@ package main
 import (
 	"crypto/tls"
 
-	"gopkg.in/mail.v2"
+	"github.com/Shopify/gomail"
 )
 
 func main() {
@@ -94,10 +93,3 @@ See [CHANGELOG.md](CHANGELOG.md).
 ## License
 
 [MIT](LICENSE)
-
-
-## Support & Contact
-
-You can ask questions on the [Gomail
-thread](https://groups.google.com/d/topic/golang-nuts/jMxZHzvvEVg/discussion)
-in the Go mailing-list.
