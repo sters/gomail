@@ -4,21 +4,23 @@
 [![codecov](https://codecov.io/gh/sters/gomail/branch/master/graph/badge.svg)](https://codecov.io/gh/sters/gomail)
 [![Go Reference](https://pkg.go.dev/badge/github.com/sters/gomail.svg)](https://pkg.go.dev/github.com/sters/gomail)
 
-This is an actively maintained fork of [Gomail][1] and includes fixes and
+This is an actively maintained fork of [go-mail/gomail][1], [Shopify/gomail][2] and includes fixes and
 improvements for a number of outstanding issues. The current progress is
 as follows:
 
 - [x] Timeouts and retries can be specified outside of the 10 second default.
-- [x] Proxying is supported through specifying a custom [NetDialTimeout][2].
+- [x] Proxying is supported through specifying a custom [NetDialTimeout][3].
 - [ ] Filenames are properly encoded for non-ASCII characters.
 - [ ] Email addresses are properly encoded for non-ASCII characters.
 - [ ] Embedded files and attachments are tested for their existence.
 - [ ] An `io.Reader` can be supplied when embedding and attaching files.
 - [ ] Context support.
 - [ ] Middleware support.
+- [ ] Remove ruby dependency about bin/style.
 
 [1]: https://github.com/go-gomail/gomail
-[2]: https://pkg.go.dev/github.com/sters/gomail#NetDialTimeout
+[2]: https://github.com/Shopify/gomail
+[3]: https://pkg.go.dev/github.com/sters/gomail#NetDialTimeout
 
 
 ## Introduction
