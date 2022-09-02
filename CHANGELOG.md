@@ -4,6 +4,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## *Unreleased*
 
+## [3.0.0-alpha.1] - 2022-09-02
+
+- Drop the support old Go versions. Now, 1.18 is the mininum version.
+
 ## [2.3.1] - 2018-11-12
 
 ### Fixed
