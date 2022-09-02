@@ -14,6 +14,8 @@ as follows:
 - [ ] Email addresses are properly encoded for non-ASCII characters.
 - [ ] Embedded files and attachments are tested for their existence.
 - [ ] An `io.Reader` can be supplied when embedding and attaching files.
+- [ ] Context support.
+- [ ] Middleware support.
 
 [1]: https://github.com/go-gomail/gomail
 [2]: https://pkg.go.dev/github.com/sters/gomail#NetDialTimeout
@@ -28,7 +30,7 @@ Gomail can only send emails using an SMTP server. But the API is flexible and it
 is easy to implement other methods for sending emails using a local Postfix, an
 API, etc.
 
-It requires Go 1.18 or newer.
+It requires Go 1.19 or newer.
 
 
 ## Features
