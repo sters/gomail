@@ -1,3 +1,5 @@
+# Contributing
+
 Thank you for contributing to Gomail! Here are a few guidelines:
 
 ## Bugs

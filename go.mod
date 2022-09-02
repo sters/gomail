@@ -1,3 +1,3 @@
-module github.com/Shopify/gomail
+module github.com/sters/gomail
 
 go 1.19

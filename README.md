@@ -1,6 +1,8 @@
 # Gomail
 
-[![Build Status](https://travis-ci.org/Shopify/gomail.svg?branch=master)](https://travis-ci.org/Shopify/gomail) [![codecov](https://codecov.io/gh/Shopify/gomail/branch/master/graph/badge.svg)](https://codecov.io/gh/Shopify/gomail) [![Documentation](https://pkg.go.dev/github.com/Shopify/gomail?status.svg)](https://pkg.go.dev/github.com/Shopify/gomail)
+[![CI](https://github.com/sters/gomail/actions/workflows/go.yml/badge.svg)](https://github.com/sters/gomail/actions/workflows/go.yml)
+[![codecov](https://codecov.io/gh/sters/gomail/branch/master/graph/badge.svg)](https://codecov.io/gh/sters/gomail)
+[![Go Reference](https://pkg.go.dev/badge/github.com/sters/gomail.svg)](https://pkg.go.dev/github.com/sters/gomail)
 
 This is an actively maintained fork of [Gomail][1] and includes fixes and
 improvements for a number of outstanding issues. The current progress is
@@ -14,7 +16,7 @@ as follows:
 - [ ] An `io.Reader` can be supplied when embedding and attaching files.
 
 [1]: https://github.com/go-gomail/gomail
-[2]: https://pkg.go.dev/github.com/Shopify/gomail#NetDialTimeout
+[2]: https://pkg.go.dev/github.com/sters/gomail#NetDialTimeout
 
 
 ## Introduction
@@ -43,12 +45,12 @@ Gomail supports:
 
 ## Documentation
 
-https://pkg.go.dev/github.com/Shopify/gomail
+https://pkg.go.dev/github.com/sters/gomail
 
 
 ## Examples
 
-See the [examples in the documentation](https://pkg.go.dev/github.com/Shopify/gomail#example-package).
+See the [examples in the documentation](https://pkg.go.dev/github.com/sters/gomail#example-package).
 
 
 ## FAQ
@@ -66,7 +68,7 @@ package main
 import (
 	"crypto/tls"
 
-	"github.com/Shopify/gomail"
+	"github.com/sters/gomail"
 )
 
 func main() {
