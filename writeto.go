@@ -2,7 +2,6 @@ package gomail
 
 import (
 	"encoding/base64"
-	"errors"
 	"io"
 	"mime"
 	"mime/multipart"
@@ -151,7 +150,7 @@ func (w *messageWriter) addFiles(files []*file, isAttachment bool) {
 
 func (w *messageWriter) Write(p []byte) (int, error) {
 	if w.err != nil {
-		return 0, errors.New("gomail: cannot write as writer is in error")
+		return 0, ErrCannotWriteAsWriter
 	}
 
 	var n int

@@ -2,12 +2,12 @@ package gomail
 
 import (
 	"bytes"
-	"errors"
-	"fmt"
 	"net/smtp"
 )
 
-const loginMechanism = "LOGIN"
+const (
+	loginMechanism = "LOGIN"
+)
 
 // loginAuth is an smtp.Auth that implements the LOGIN authentication mechanism.
 type loginAuth struct {
@@ -26,11 +26,11 @@ func (a *loginAuth) Start(server *smtp.ServerInfo) (string, []byte, error) {
 			}
 		}
 		if !advertised {
-			return "", nil, errors.New("gomail: unencrypted connection")
+			return "", nil, ErrUnencryptedConnection
 		}
 	}
 	if server.Name != a.host {
-		return "", nil, errors.New("gomail: wrong host name")
+		return "", nil, ErrWrongHostName
 	}
 	return loginMechanism, nil, nil
 }
@@ -46,6 +46,6 @@ func (a *loginAuth) Next(fromServer []byte, more bool) ([]byte, error) {
 	case bytes.Equal(fromServer, []byte("Password:")):
 		return []byte(a.password), nil
 	default:
-		return nil, fmt.Errorf("gomail: unexpected server challenge: %s", fromServer)
+		return nil, &UnexpectedServerChallengeError{fromServer}
 	}
 }

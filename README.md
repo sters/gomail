@@ -17,6 +17,8 @@ as follows:
 - [ ] Context support.
 - [ ] Middleware support.
 - [ ] Remove ruby dependency about bin/style.
+- [x] Error definitions.
+- [ ] Parallel testing.
 
 [1]: https://github.com/go-gomail/gomail
 [2]: https://github.com/Shopify/gomail
