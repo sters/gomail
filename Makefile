@@ -1,23 +1,40 @@
-GOFILES := $(shell find . -path ./vendor -prune -o -type f -name '*.go' -print)
+export GOBIN := $(PWD)/bin
+export PATH := $(GOBIN):$(PATH)
 
-all: test
+TOOLS=$(shell cat tools/tools.go | egrep '^\s_ '  | awk '{ print $$2 }')
 
+.PHONY: bootstrap-tools
+bootstrap-tools:
+	@echo "Installing: " $(TOOLS)
+	@go install $(TOOLS)
+
+.PHONY: lint
+lint: bootstrap-tools
+	$(GOBIN)/golangci-lint run -v ./...
+
+.PHONY: lint-fix
+lint-fix: bootstrap-tools
+	$(GOBIN)/golangci-lint run --fix -v ./...
+
+.PHONY: test
 test:
-	go test ./...
+	go test -v -race ./...
 
+.PHONY: coverage
 coverage: coverage.txt
 
 coverage.txt: $(GOFILES) Makefile
 	go test -coverprofile=coverage.txt -covermode=atomic ./...
 
+.PHONY: show-coverage
 show-coverage: coverage.txt
 	go tool cover -html=coverage.txt
 
-style: $(GOFILES) Makefile .golangci.yml
-	bin/style
-
+.PHONY: clean
 clean:
 	go clean
 	rm -f coverage.txt
 
-.PHONY: clean test coverage show-coverage
+.PHONY: tidy
+tidy:
+	go mod tidy

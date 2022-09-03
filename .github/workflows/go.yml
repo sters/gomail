@@ -47,7 +47,7 @@ jobs:
     - name: Tidy
       run: |
         cp go.sum{,.old}
-        go mod tidy
+        make tidy
         diff go.sum{.old,}
 
   test:

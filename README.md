@@ -16,7 +16,7 @@ as follows:
 - [ ] An `io.Reader` can be supplied when embedding and attaching files.
 - [ ] Context support.
 - [ ] Middleware support.
-- [ ] Remove ruby dependency about bin/style.
+- [x] Remove ruby dependency about bin/style.
 - [x] Error definitions.
 - [ ] Parallel testing.
 
