@@ -23,6 +23,15 @@ func Example() {
 	d := mail.NewDialer("smtp.example.com", 587, "user", "123456")
 	d.StartTLSPolicy = mail.MandatoryStartTLS
 
+	dialStats := &mail.OnMemoryDialStatus{}
+	d.DialMiddlewares = mail.DialMiddlewares{
+		mail.WithOnMemoryDialStats(dialStats),
+	}
+	sendStats := &mail.OnMemorySendStats{}
+	d.SendMiddlewares = mail.SendMiddlewares{
+		mail.WithOnMemorySendStats(sendStats),
+	}
+
 	// Send the email to Bob, Cora and Dan.
 	if err := d.DialAndSend(context.Background(), m); err != nil {
 		panic(err)

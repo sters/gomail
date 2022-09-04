@@ -51,6 +51,9 @@ type Dialer struct {
 	// most cases since the authentication mechanism should use the STARTTLS
 	// extension instead.
 	SSL bool
+
+	DialMiddlewares DialMiddlewares
+	SendMiddlewares SendMiddlewares
 }
 
 // NewDialer returns a new SMTP Dialer. The given parameters are used to connect
@@ -70,10 +73,16 @@ func NewDialer(host string, port int, username, password string) *Dialer {
 
 // for test stubbing
 var dialContext = func(ctx context.Context, d *Dialer) (net.Conn, error) {
-	return (&net.Dialer{
-		Timeout:   d.Timeout,
-		KeepAlive: d.KeepAlive,
-	}).DialContext(ctx, "tcp", addr(d.Host, d.Port))
+	return invokeDial(
+		ctx,
+		d.DialMiddlewares,
+		(&net.Dialer{
+			Timeout:   d.Timeout,
+			KeepAlive: d.KeepAlive,
+		}).DialContext,
+		"tcp",
+		addr(d.Host, d.Port),
+	)
 }
 
 // Dial dials and authenticates to an SMTP server. The returned SendCloser
@@ -229,37 +238,46 @@ func (c *smtpSender) retryError(err error) bool {
 }
 
 func (c *smtpSender) Send(ctx context.Context, from string, to []string, msg io.WriterTo) error {
-	if err := c.Mail(from); err != nil {
-		if c.retryError(err) {
-			// This is probably due to a timeout, so reconnect and try again.
-			if sc, derr := c.d.Dial(ctx); derr == nil {
-				if s, ok := sc.(*smtpSender); ok {
-					*c = *s
-					return c.Send(ctx, from, to, msg)
+	return invokeSend(
+		ctx,
+		c.d.SendMiddlewares,
+		func(ctx context.Context, from string, to []string, msg io.WriterTo) error {
+			if err := c.Mail(from); err != nil {
+				if c.retryError(err) {
+					// This is probably due to a timeout, so reconnect and try again.
+					if sc, derr := c.d.Dial(ctx); derr == nil {
+						if s, ok := sc.(*smtpSender); ok {
+							*c = *s
+							return c.Send(ctx, from, to, msg)
+						}
+					}
+				}
+
+				return err
+			}
+
+			for _, addr := range to {
+				if err := c.Rcpt(addr); err != nil {
+					return err
 				}
 			}
-		}
 
-		return err
-	}
+			w, err := c.Data()
+			if err != nil {
+				return err
+			}
 
-	for _, addr := range to {
-		if err := c.Rcpt(addr); err != nil {
-			return err
-		}
-	}
+			if _, err = msg.WriteTo(w); err != nil {
+				_ = w.Close()
+				return err
+			}
 
-	w, err := c.Data()
-	if err != nil {
-		return err
-	}
-
-	if _, err = msg.WriteTo(w); err != nil {
-		_ = w.Close()
-		return err
-	}
-
-	return w.Close()
+			return w.Close()
+		},
+		from,
+		to,
+		msg,
+	)
 }
 
 func (c *smtpSender) Close() error {

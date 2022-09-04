@@ -15,7 +15,7 @@ as follows:
 - [ ] Embedded files and attachments are tested for their existence.
 - [ ] An `io.Reader` can be supplied when embedding and attaching files.
 - [x] Context support.
-- [ ] Middleware support.
+- [x] Middleware support.
 - [x] Remove ruby dependency about bin/style.
 - [x] Error definitions.
 - [ ] Parallel testing.
