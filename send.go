@@ -1,6 +1,7 @@
 package gomail
 
 import (
+	"context"
 	"io"
 	stdmail "net/mail"
 )
@@ -9,7 +10,7 @@ import (
 //
 // Send sends an email to the given addresses.
 type Sender interface {
-	Send(from string, to []string, msg io.WriterTo) error
+	Send(ctx context.Context, sfrom string, to []string, msg io.WriterTo) error
 }
 
 // SendCloser is the interface that groups the Send and Close methods.
@@ -23,17 +24,17 @@ type SendCloser interface {
 // The SendFunc type is an adapter to allow the use of ordinary functions as
 // email senders. If f is a function with the appropriate signature, SendFunc(f)
 // is a Sender object that calls f.
-type SendFunc func(from string, to []string, msg io.WriterTo) error
+type SendFunc func(ctx context.Context, from string, to []string, msg io.WriterTo) error
 
 // Send calls f(from, to, msg).
-func (f SendFunc) Send(from string, to []string, msg io.WriterTo) error {
-	return f(from, to, msg)
+func (f SendFunc) Send(ctx context.Context, from string, to []string, msg io.WriterTo) error {
+	return f(ctx, from, to, msg)
 }
 
 // Send sends emails using the given Sender.
-func Send(s Sender, msg ...*Message) error {
+func Send(ctx context.Context, s Sender, msg ...*Message) error {
 	for i, m := range msg {
-		if err := send(s, m); err != nil {
+		if err := send(ctx, s, m); err != nil {
 			return &SendError{Cause: err, Index: uint(i)}
 		}
 	}
@@ -41,7 +42,7 @@ func Send(s Sender, msg ...*Message) error {
 	return nil
 }
 
-func send(s Sender, m *Message) error {
+func send(ctx context.Context, s Sender, m *Message) error {
 	from, err := m.getFrom()
 	if err != nil {
 		return err
@@ -52,7 +53,7 @@ func send(s Sender, m *Message) error {
 		return err
 	}
 
-	if err := s.Send(from, to, m); err != nil {
+	if err := s.Send(ctx, from, to, m); err != nil {
 		return err
 	}
 

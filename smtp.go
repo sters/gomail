@@ -1,6 +1,7 @@
 package gomail
 
 import (
+	"context"
 	"crypto/tls"
 	"fmt"
 	"io"
@@ -40,6 +41,9 @@ type Dialer struct {
 	// Timeout to use for read/write operations. Defaults to 10 seconds, can
 	// be set to 0 to disable timeouts.
 	Timeout time.Duration
+	// KeepAlive specifies the interval between keep-alive probes for
+	// an active network connection, can be set to 0 to disable timeouts.
+	KeepAlive time.Duration
 	// Whether we should retry mailing if the connection returned an error,
 	// defaults to true.
 	RetryFailure bool
@@ -59,19 +63,23 @@ func NewDialer(host string, port int, username, password string) *Dialer {
 		Password:     password,
 		SSL:          port == 465,
 		Timeout:      10 * time.Second,
+		KeepAlive:    10 * time.Second,
 		RetryFailure: true,
 	}
 }
 
-// NetDialTimeout specifies the DialTimeout function to establish a connection
-// to the SMTP server. This can be used to override dialing in the case that a
-// proxy or other special behavior is needed.
-var NetDialTimeout = net.DialTimeout
+// for test stubbing
+var dialContext = func(ctx context.Context, d *Dialer) (net.Conn, error) {
+	return (&net.Dialer{
+		Timeout:   d.Timeout,
+		KeepAlive: d.KeepAlive,
+	}).DialContext(ctx, "tcp", addr(d.Host, d.Port))
+}
 
 // Dial dials and authenticates to an SMTP server. The returned SendCloser
 // should be closed when done using it.
-func (d *Dialer) Dial() (SendCloser, error) {
-	conn, err := NetDialTimeout("tcp", addr(d.Host, d.Port), d.Timeout)
+func (d *Dialer) Dial(ctx context.Context) (SendCloser, error) {
+	conn, err := dialContext(ctx, d)
 	if err != nil {
 		return nil, err
 	}
@@ -83,10 +91,6 @@ func (d *Dialer) Dial() (SendCloser, error) {
 	c, err := smtpNewClient(conn, d.Host)
 	if err != nil {
 		return nil, err
-	}
-
-	if d.Timeout > 0 {
-		conn.SetDeadline(time.Now().Add(d.Timeout))
 	}
 
 	if d.LocalName != "" {
@@ -105,7 +109,7 @@ func (d *Dialer) Dial() (SendCloser, error) {
 
 		if ok {
 			if err := c.StartTLS(d.tlsConfig()); err != nil {
-				c.Close()
+				_ = c.Close()
 				return nil, err
 			}
 		}
@@ -130,7 +134,7 @@ func (d *Dialer) Dial() (SendCloser, error) {
 
 	if d.Auth != nil {
 		if err = c.Auth(d.Auth); err != nil {
-			c.Close()
+			_ = c.Close()
 			return nil, err
 		}
 	}
@@ -192,14 +196,16 @@ func addr(host string, port int) string {
 
 // DialAndSend opens a connection to the SMTP server, sends the given emails and
 // closes the connection.
-func (d *Dialer) DialAndSend(m ...*Message) error {
-	s, err := d.Dial()
+func (d *Dialer) DialAndSend(ctx context.Context, m ...*Message) error {
+	s, err := d.Dial(ctx)
 	if err != nil {
 		return err
 	}
-	defer s.Close()
+	defer func() {
+		_ = s.Close()
+	}()
 
-	return Send(s, m...)
+	return Send(ctx, s, m...)
 }
 
 type smtpSender struct {
@@ -207,6 +213,8 @@ type smtpSender struct {
 	conn net.Conn
 	d    *Dialer
 }
+
+var _ SendCloser = (*smtpSender)(nil)
 
 func (c *smtpSender) retryError(err error) bool {
 	if !c.d.RetryFailure {
@@ -220,19 +228,14 @@ func (c *smtpSender) retryError(err error) bool {
 	return err == io.EOF
 }
 
-func (c *smtpSender) Send(from string, to []string, msg io.WriterTo) error {
-	if c.d.Timeout > 0 {
-		c.conn.SetDeadline(time.Now().Add(c.d.Timeout))
-	}
-
+func (c *smtpSender) Send(ctx context.Context, from string, to []string, msg io.WriterTo) error {
 	if err := c.Mail(from); err != nil {
 		if c.retryError(err) {
 			// This is probably due to a timeout, so reconnect and try again.
-			sc, derr := c.d.Dial()
-			if derr == nil {
+			if sc, derr := c.d.Dial(ctx); derr == nil {
 				if s, ok := sc.(*smtpSender); ok {
 					*c = *s
-					return c.Send(from, to, msg)
+					return c.Send(ctx, from, to, msg)
 				}
 			}
 		}
@@ -252,7 +255,7 @@ func (c *smtpSender) Send(from string, to []string, msg io.WriterTo) error {
 	}
 
 	if _, err = msg.WriteTo(w); err != nil {
-		w.Close()
+		_ = w.Close()
 		return err
 	}
 

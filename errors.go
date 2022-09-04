@@ -67,8 +67,8 @@ func (*InvalidAddress) Is(err error) bool {
 	return false
 }
 
-var _ []error = []error{
-	&SendError{},
-	&UnexpectedServerChallengeError{},
-	&InvalidAddress{},
+var _ = []error{
+	(*SendError)(nil),
+	(*UnexpectedServerChallengeError)(nil),
+	(*InvalidAddress)(nil),
 }

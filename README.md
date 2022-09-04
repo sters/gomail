@@ -14,7 +14,7 @@ as follows:
 - [ ] Email addresses are properly encoded for non-ASCII characters.
 - [ ] Embedded files and attachments are tested for their existence.
 - [ ] An `io.Reader` can be supplied when embedding and attaching files.
-- [ ] Context support.
+- [x] Context support.
 - [ ] Middleware support.
 - [x] Remove ruby dependency about bin/style.
 - [x] Error definitions.

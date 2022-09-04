@@ -2,6 +2,7 @@ package gomail
 
 import (
 	"bytes"
+	"context"
 	"encoding/base64"
 	"io"
 	"path/filepath"
@@ -350,9 +351,9 @@ func TestRename(t *testing.T) {
 	m.SetHeader("From", "from@example.com")
 	m.SetHeader("To", "to@example.com")
 	m.SetBody("text/plain", "Test")
-	name, copy := mockCopyFile("/tmp/test.pdf")
+	name, cp := mockCopyFile("/tmp/test.pdf")
 	rename := Rename("another.pdf")
-	m.Attach(name, copy, rename)
+	m.Attach(name, cp, rename)
 
 	want := &message{
 		from: "from@example.com",
@@ -673,14 +674,14 @@ func TestEmptyHeader(t *testing.T) {
 }
 
 func testMessage(t *testing.T, m *Message, bCount int, want *message) {
-	err := Send(stubSendMail(t, bCount, want), m)
+	err := Send(context.Background(), stubSendMail(t, bCount, want), m)
 	if err != nil {
 		t.Error(err)
 	}
 }
 
 func stubSendMail(t *testing.T, bCount int, want *message) SendFunc {
-	return func(from string, to []string, m io.WriterTo) error {
+	return func(ctx context.Context, from string, to []string, m io.WriterTo) error {
 		if from != want.from {
 			t.Fatalf("Invalid from, got %q, want %q", from, want.from)
 		}
@@ -779,7 +780,7 @@ func getBoundaries(t *testing.T, count int, m string) []string {
 	}
 
 	t.Fatal("Boundary not found in body")
-	return []string{""}
+	return nil
 }
 
 var boundaryRegExp = regexp.MustCompile(`boundary=(\w+)`)
@@ -797,7 +798,7 @@ func mockCopyFileWithHeader(name string, h map[string][]string) (string, FileSet
 }
 
 func BenchmarkFull(b *testing.B) {
-	discardFunc := SendFunc(func(from string, to []string, m io.WriterTo) error {
+	discardFunc := SendFunc(func(ctx context.Context, from string, to []string, m io.WriterTo) error {
 		_, err := m.WriteTo(io.Discard)
 		return err
 	})
@@ -817,7 +818,7 @@ func BenchmarkFull(b *testing.B) {
 		m.Attach(mockCopyFile("benchmark.txt"))
 		m.Embed(mockCopyFile("benchmark.jpg"))
 
-		if err := Send(discardFunc, m); err != nil {
+		if err := Send(context.Background(), discardFunc, m); err != nil {
 			panic(err)
 		}
 		m.Reset()
